@@ -1,0 +1,67 @@
+name: Upload Chain Spec Artifacts to Kubernetes PVC
+description: Uploads chain‑spec artifacts to PVCs for devnet and staging‑preview.
+
+inputs:
+  sha:
+    description: Commit SHA to append to chain‑spec file
+    required: true
+
+outputs: {}
+
+runs:
+  using: composite
+  steps:
+    - name: Install kubectl, kubernetes-helm, and awscli
+      run: |
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x ./kubectl
+        sudo mv ./kubectl /usr/local/bin/kubectl
+        VERSION=$(curl --silent "https://api.github.com/repos/helm/helm/releases/latest" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
+        curl -L "https://get.helm.sh/helm-${VERSION}-linux-amd64.tar.gz" -o helm.tar.gz
+        tar -zxvf helm.tar.gz
+        sudo mv linux-amd64/helm /usr/local/bin/helm
+        rm -rf linux-amd64 helm.tar.gz
+        sudo apt-get update
+        sudo apt-get install -y python3-pip
+        pip3 install awscli --upgrade
+      shell: bash
+
+    - name: Configure kubectl
+      run: |
+        echo "${{ env.kubeconfig_base64 }}" | base64 --decode > ${{ runner.temp }}/kubeconfig.yaml
+        kubectl config set-cluster my-cluster --server=${{ env.K8S_SERVER }} --insecure-skip-tls-verify=true
+        kubectl config set-credentials github-actions --token=${{ env.K8S_SA_TOKEN }}
+        kubectl config set-context my-context --cluster=my-cluster --user=github-actions --namespace=default
+        kubectl config use-context my-context
+      shell: bash
+
+    - name: Download chain‑spec artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: chain-specs
+
+    - name: Upload chain-spec artifacts to chain-specs PVC via pvc-uploader pods
+      shell: bash
+      run: |
+        set -e
+
+        if [ -f ./devnet_chain_spec.json ]; then
+          pod=$(kubectl get pod -n sc -l app=pvc-uploader-sc -o jsonpath='{.items[0].metadata.name}')
+          kubectl cp ./devnet_chain_spec.json sc/$pod:/mnt/chain-spec/devnet-chain-spec-${{ inputs.sha }}.json
+        fi
+
+        if [ -f ./ci_preview_chain_spec.json ]; then
+          pod=$(kubectl get pod -n ci-preview -l app=pvc-uploader-ci-preview -o jsonpath='{.items[0].metadata.name}')
+          kubectl cp ./ci_preview_chain_spec.json ci-preview/$pod:/mnt/chain-spec/ci-preview-chain-spec-${{ inputs.sha }}.json
+        fi
+
+        if [ -f ./staging_preview_chain_spec.json ]; then
+          pod=$(kubectl get pod -n staging-preview -l app=pvc-uploader-staging-preview -o jsonpath='{.items[0].metadata.name}')
+          kubectl cp ./staging_preview_chain_spec.json staging-preview/$pod:/mnt/chain-spec/staging-preview-chain-spec-${{ inputs.sha }}.json
+        fi
+
+        if [ -f ./staging_preprod_chain_spec.json ]; then
+          pod=$(kubectl get pod -n staging-preprod -l app=pvc-uploader-staging-preprod -o jsonpath='{.items[0].metadata.name}')
+          kubectl cp ./staging_preprod_chain_spec.json staging-preprod/$pod:/mnt/chain-spec/staging-preprod-chain-spec-${{ inputs.sha }}.json
+        fi
+

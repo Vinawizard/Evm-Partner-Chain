@@ -1,0 +1,77 @@
+warning: hiding a lifetime that's elided elsewhere is confusing
+  --> /home/vinawizard/evm-partner-chain/frontier/client/rpc/src/eth/pending.rs:64:42
+   |
+64 |     pub(crate) async fn pending_runtime_api(&self) -> Result<(B::Hash, ApiRef<C::Api>), Error> {
+   |                                             ^^^^^                      -------------- the same lifetime is hidden here
+   |                                             |
+   |                                             the lifetime is elided here
+   |
+   = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+   = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+   |
+64 |     pub(crate) async fn pending_runtime_api(&self) -> Result<(B::Hash, ApiRef<'_, C::Api>), Error> {
+   |                                                                               +++
+
+warning: unused import: `fp_rpc::TransactionStatus`
+  --> demo/runtime/src/lib.rs:67:5
+   |
+67 | use fp_rpc::TransactionStatus;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: `fc-rpc` (lib) generated 1 warning
+warning: `partner-chains-demo-runtime` (lib) generated 1 warning (run `cargo fix --lib -p partner-chains-demo-runtime` to apply 1 suggestion)
+warning: unused import: `EthConfig`
+  --> demo/node/src/rpc.rs:42:37
+   |
+42 | use fc_rpc::{EthBlockDataCacheTask, EthConfig};
+   |                                     ^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `StorageOverrideHandler`
+  --> demo/node/src/rpc.rs:44:35
+   |
+44 | use fc_storage::{StorageOverride, StorageOverrideHandler};
+   |                                   ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `ConvertTransactionRuntimeApi` and `ConvertTransaction`
+  --> demo/node/src/rpc.rs:45:14
+   |
+45 | use fp_rpc::{ConvertTransaction, ConvertTransactionRuntimeApi, EthereumRuntimeRPCApi};
+   |              ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `fc_db::Backend as FrontierBackend`
+  --> demo/node/src/service.rs:29:5
+   |
+29 | use fc_db::Backend as FrontierBackend;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `sp_runtime::traits::Block`
+  --> demo/node/src/rpc.rs:50:5
+   |
+50 | use sp_runtime::traits::Block as BlockT;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: missing documentation for a struct
+   --> demo/node/src/rpc.rs:104:1
+    |
+104 | pub struct DefaultEthConfig<C, BE>(std::marker::PhantomData<(C, BE)>);
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+note: the lint level is defined here
+   --> demo/node/src/rpc.rs:6:9
+    |
+  6 | #![warn(missing_docs)]
+    |         ^^^^^^^^^^^^
+
+warning: `partner-chains-demo-node` (lib) generated 6 warnings (run `cargo fix --lib -p partner-chains-demo-node` to apply 4 suggestions)
+warning: `partner-chains-demo-node` (bin "partner-chains-demo-node") generated 5 warnings (5 duplicates)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.74s
+warning: the following packages contain code that will be rejected by a future version of Rust: trie-db v0.30.0
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+     Running `target/debug/partner-chains-demo-node --dev`
+Unable to start the node due to missing or malformed environment variables. This issue typically occurs when the node executable is launched directly. Instead, please use the `./partner-chains-cli start-node` command, which sets up all the necessary environment variables for you. This command also displays the complete node startup command, including the required environment variables, allowing you to use it directly if needed.
+Error: Input("Reading configuration from environment failed: missing value for field committee_candidate_address")

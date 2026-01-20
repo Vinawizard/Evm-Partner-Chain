@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🇮🇳 India Chain - Land Registry Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #FF9933 0%, #FFFFFF 50%, #138808 100%);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin: 0;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        .subtitle {
+            color: #555;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #000080;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+            margin-top: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: #444;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .tag {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .tag-sale {
+            background: #e6f4ea;
+            color: #137333;
+        }
+
+        .tag-owned {
+            background: #feefe3;
+            color: #b06000;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .error {
+            color: #d32f2f;
+            background: #fdecea;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        button {
+            background: #000080;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #000050;
+        }
+
+        .refresh-btn {
+            float: right;
+            margin-top: -10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🇮🇳 India Chain Land Registry</h1>
+            <div class="subtitle">Cardano EVM Partner Chain Demo</div>
+        </header>
+
+        <div id="error-box" class="error"></div>
+
+        <div class="stat-grid">
+            <div class="stat-box">
+                <div class="stat-label">Total Lands Registered</div>
+                <div id="total-lands" class="stat-value">-</div>
+            </div>
+            <div class="stat-box" style="border-left-color: #FF9933;">
+                <div class="stat-label">Contract Address</div>
+                <div id="contract-address" class="stat-value" style="font-size: 0.9em; word-break: break-all;">-</div>
+            </div>
+            <div class="stat-box" style="border-left-color: #138808;">
+                <div class="stat-label">Network Status</div>
+                <div id="network-status" class="stat-value" style="color: #138808; font-size: 1.2em;">Connecting...
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <button class="refresh-btn" onclick="loadData()">↻ Refresh Data</button>
+            <h2 style="margin-top: 0; color: #333;">🌾 Registered Farmlands</h2>
+            <div id="lands-container">
+                <div class="loading">Connecting to India Chain (Local Node)...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const RPC_URL = 'http://127.0.0.1:9944'; // Local Partner Chain Node
+        // Contract Address (Updated from your deployment)
+        const CONTRACT_ADDRESS = '0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0';
+
+        const ABI = [
+            "function landCount() view returns (uint256)",
+            "function getLand(uint256 landId) view returns (string location, uint256 area, address owner, uint256 price, bool isForSale, uint256 registeredAt)",
+            "function registrar() view returns (address)"
+        ];
+
+        async function loadData() {
+            const errorBox = document.getElementById('error-box');
+            const container = document.getElementById('lands-container');
+            const statusEl = document.getElementById('network-status');
+
+            errorBox.style.display = 'none';
+            container.innerHTML = '<div class="loading">Loading blockchain data...</div>';
+
+            try {
+                // Connect to RPC
+                const provider = new ethers.JsonRpcProvider(RPC_URL);
+
+                // basic check
+                const network = await provider.getNetwork();
+                statusEl.textContent = `Connected (Chain ID: ${network.chainId})`;
+
+                document.getElementById('contract-address').textContent = CONTRACT_ADDRESS;
+
+                // Contract Instance
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
+
+                // Fetch Total Count
+                const count = await contract.landCount();
+                document.getElementById('total-lands').textContent = count.toString();
+
+                // Fetch All Lands
+                let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Location / Farmer Name</th>
+                            <th>Area (sq.m)</th>
+                            <th>Owner Address</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+                if (Number(count) === 0) {
+                    container.innerHTML = '<div class="loading">No lands registered yet. Use the CLI to register some!</div>';
+                    return;
+                }
+
+                for (let i = 1; i <= count; i++) {
+                    try {
+                        const land = await contract.getLand(i);
+                        html += `
+                    <tr>
+                        <td><strong>#${i}</strong></td>
+                        <td style="font-weight: 500; color: #000080;">${land.location}</td>
+                        <td>${land.area.toString()} m²</td>
+                        <td style="font-family: monospace; color: #666;">${land.owner}</td>
+                        <td>
+                            ${land.isForSale
+                                ? `<span class="tag tag-sale">For Sale (${ethers.formatEther(land.price)} ETH)</span>`
+                                : `<span class="tag tag-owned">Registered</span>`}
+                        </td>
+                    </tr>
+                `;
+                    } catch (err) {
+                        console.error("Error fetching land " + i, err);
+                    }
+                }
+
+                html += '</tbody></table>';
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error(error);
+                errorBox.textContent = `Connection Error: ${error.message}. Is your local node running at ${RPC_URL}?`;
+                errorBox.style.display = 'block';
+                statusEl.textContent = 'Disconnected';
+                container.innerHTML = '<div class="loading">Failed to load data</div>';
+            }
+        }
+
+        // Load on start
+        window.addEventListener('DOMContentLoaded', loadData);
+    </script>
+
+</body>
+
+</html>

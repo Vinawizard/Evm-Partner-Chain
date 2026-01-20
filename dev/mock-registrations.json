@@ -1,0 +1,30 @@
+[
+    {
+        "permissioned": [
+            {
+                "name": "Alice Permissioned",
+                "sidechain_pub_key": "0x020a1091341fe5664bfa1782d5e04779689068c916b04cb365ec3153755684d9a1",
+                "aura_pub_key": "0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+                "grandpa_pub_key": "0x88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee"
+            }
+        ],
+        "registrations": [
+            {
+                "name": "Alice Registered",
+                "sidechain_pub_key": "0x020a1091341fe5664bfa1782d5e04779689068c916b04cb365ec3153755684d9a1",
+                "mainchain_pub_key": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "mainchain_signature": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                "sidechain_signature": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                "registration_utxo": "0x0000000000000000000000000000000000000000000000000000000000000000#0",
+                "status": "Active",
+                "aura_pub_key": "0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+                "grandpa_pub_key": "0x88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee"
+            }
+        ],
+        "nonce": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "d_parameter": {
+            "permissioned": 16,
+            "registered": 16
+        }
+    }
+]

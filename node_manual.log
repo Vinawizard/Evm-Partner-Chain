@@ -1,0 +1,14 @@
+Starting Partner Chains Demo Node (Manual Mode)...
+CLI parameter `--execution` has no effect anymore and will be removed in the future!
+2026-01-07 23:48:54 Partner Chains Node
+2026-01-07 23:48:54 ✌️  version 1.8.1-f48d49b18cd
+2026-01-07 23:48:54 ❤️  by IOG, 2017-2026
+2026-01-07 23:48:54 📋 Chain specification: Development
+2026-01-07 23:48:54 🏷  Node name: various-beds-7467
+2026-01-07 23:48:54 👤 Role: AUTHORITY
+2026-01-07 23:48:54 💾 Database: RocksDb at /tmp/substrateyEvJGm/chains/dev/db/full
+2026-01-07 23:48:54 Reading registrations from: /home/vinawizard/evm-partner-chain/partner-chains/dev/mock-registrations.json
+2026-01-07 23:48:54 Loaded 1 registration rotations
+2026-01-07 23:49:05 Start session 0, epoch 0
+Error: Service(Client(VersionInvalid("Other error happened while constructing the runtime: runtime requires function imports which are not present on the host: 'env:ext_storage_proof_size_storage_proof_size_version_1'")))
+2026-01-07 23:49:12 Cannot create a runtime error=Other("runtime requires function imports which are not present on the host: 'env:ext_storage_proof_size_storage_proof_size_version_1'")

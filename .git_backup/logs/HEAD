@@ -1,0 +1,17 @@
+0000000000000000000000000000000000000000 56c3af3f9f665b79a1d2212c3fe714b814fbe270 vinawizard <vinawizard@Batcomputer> 1767707515 +0530	clone: from https://github.com/input-output-hk/partner-chains.git
+56c3af3f9f665b79a1d2212c3fe714b814fbe270 75cad9661b4cf81f3635ef5bce2fe47bf5d040b1 Vina Wizard <vinawizard@localhost> 1767779682 +0530	commit: Phase C complete - clean WASM build with Frontier stable2509
+75cad9661b4cf81f3635ef5bce2fe47bf5d040b1 797c57365dbd86c4a1b38af32e2be2051c37ca73 Vina Wizard <vinawizard@localhost> 1767780216 +0530	commit: Phase D complete: Minimal EVM runtime with pallet_evm and pallet_ethereum
+797c57365dbd86c4a1b38af32e2be2051c37ca73 303b627f1e6f4f83062cddd3547e2ac35110e4d5 Vina Wizard <vinawizard@localhost> 1767780662 +0530	commit: Phase D cleanup: Remove unused Frontier patches, use explicit path dependencies
+303b627f1e6f4f83062cddd3547e2ac35110e4d5 a12ac03ace96ef8097eb48142089fb3b41615511 Vina Wizard <vinawizard@localhost> 1767781459 +0530	commit: Phase E1 complete: Frontier RPC dependencies added to node, genesis configs fixed
+a12ac03ace96ef8097eb48142089fb3b41615511 e764ff6b861d95fbad20e8a746da81dca4f47703 Vina Wizard <vinawizard@localhost> 1767782735 +0530	commit: Phase E reset: Clean state with fc-mapping-sync, ready for Moonbeam-style RPC
+e764ff6b861d95fbad20e8a746da81dca4f47703 cdb4bba254a48b1e4e3d63e3ec110c86cef88e50 Vina Wizard <vinawizard@localhost> 1767783882 +0530	commit: E1.1: Add Frontier backend imports to service.rs
+cdb4bba254a48b1e4e3d63e3ec110c86cef88e50 42af95034019b87dd2a71039d43b3deadc586a21 Vina Wizard <vinawizard@localhost> 1767785697 +0530	commit: E1.2 WIP: Frontier backend initialization (needs API fix)
+42af95034019b87dd2a71039d43b3deadc586a21 55d60df06ad0518badff856ccf651fbc0914bb4b Vina Wizard <vinawizard@localhost> 1767785988 +0530	commit: E1.2 COMPLETE: Frontier backend initialized in new_partial()
+55d60df06ad0518badff856ccf651fbc0914bb4b e20d00b4730e8f21704d9c6ae9d213d5a1481f61 Vina Wizard <vinawizard@localhost> 1767786531 +0530	commit: E2: Skipped MappingSyncWorker (requires runtime API, runtime frozen)
+e20d00b4730e8f21704d9c6ae9d213d5a1481f61 f48d49b18cd71dc0f864b0dd966d551ef2364ff9 Vina Wizard <vinawizard@localhost> 1767788608 +0530	commit: E2 complete: Frontier backend + MappingSyncWorker + minimal EthereumRuntimeRPCApi
+f48d49b18cd71dc0f864b0dd966d551ef2364ff9 b2c8cbfd6a443b8ac143005e97aa688055b312b1 Vina Wizard <vinawizard@localhost> 1767795706 +0530	commit: feat: EVM partner chain complete (runtime + frontier backend + RPC wiring)
+b2c8cbfd6a443b8ac143005e97aa688055b312b1 88c5045400fc6ac4e872efd09906983a70b7e475 Your Name <you@example.com> 1768937992 +0530	commit: feat: EVM Partner Chain Implementation + Documentation
+88c5045400fc6ac4e872efd09906983a70b7e475 bc4947587f7d065985a12ee183e9b7d85eb576d5 Your Name <you@example.com> 1768938024 +0530	commit: docs: Add user guide for MetaMask and Remix
+bc4947587f7d065985a12ee183e9b7d85eb576d5 ff8f9f7a54f91d8d774388bb4980e73e4f754d44 Your Name <you@example.com> 1768938386 +0530	commit: docs: Add detailed EVM guides and operational runbook
+ff8f9f7a54f91d8d774388bb4980e73e4f754d44 ff8f9f7a54f91d8d774388bb4980e73e4f754d44 Your Name <you@example.com> 1768938475 +0530	checkout: moving from ff8f9f7a54f91d8d774388bb4980e73e4f754d44 to main
+ff8f9f7a54f91d8d774388bb4980e73e4f754d44 ff8f9f7a54f91d8d774388bb4980e73e4f754d44 Your Name <you@example.com> 1768938620 +0530	checkout: moving from main to evm-complete-v1

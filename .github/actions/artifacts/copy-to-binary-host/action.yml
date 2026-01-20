@@ -1,0 +1,73 @@
+name: "Copy to binary-host"
+description: "Copied binary to binary-host"
+inputs:
+  sha:
+    description: "Git SHA"
+    required: true
+  env:
+    description: "ci-preview or staging (used to determine the binary-host /tools subdirectory)"
+    required: true
+
+outputs: {}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Acquire AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ env.AWS_ROLE_ARN_SECRET }}
+        aws-region: eu-central-1
+
+    - name: Install kubectl, kubernetes-helm, and awscli
+      run: |
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x ./kubectl
+        sudo mv ./kubectl /usr/local/bin/kubectl
+        VERSION=$(curl --silent "https://api.github.com/repos/helm/helm/releases/latest" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
+        curl -L "https://get.helm.sh/helm-${VERSION}-linux-amd64.tar.gz" -o helm.tar.gz
+        tar -zxvf helm.tar.gz
+        sudo mv linux-amd64/helm /usr/local/bin/helm
+        rm -rf linux-amd64 helm.tar.gz
+        sudo apt-get update
+        sudo apt-get install -y python3-pip
+        pip3 install awscli --upgrade
+      shell: bash
+
+    - name: Configure kubectl
+      run: |
+        echo "${{ env.kubeconfig_base64 }}" | base64 --decode > ${{ runner.temp }}/kubeconfig.yaml
+        kubectl config set-cluster my-cluster --server=${{ env.K8S_SERVER }} --insecure-skip-tls-verify=true
+        kubectl config set-credentials github-actions --token=${{ env.K8S_SA_TOKEN }}
+        kubectl config set-context my-context --cluster=my-cluster --user=github-actions --namespace=default
+        kubectl config use-context my-context
+      shell: bash
+
+    - name: Get binary-host pod name
+      id: get-pod-name
+      run: |
+        POD_NAME=$(kubectl get pods -n sc -l app=binary-host -o jsonpath='{.items[0].metadata.name}')
+        echo "pod_name=$POD_NAME" >> $GITHUB_OUTPUT
+        echo "Found binary-host pod: $POD_NAME"
+      shell: bash
+
+    - name: Create Subdirs (if they don't exist)
+      run: |
+        kubectl exec -n sc ${{ steps.get-pod-name.outputs.pod_name }} -c binary-host -- mkdir -p /tools/${{ inputs.env }}
+      shell: bash
+
+    - name: Delete old partner-chains-node binaries
+      run: |
+        kubectl exec ${{ steps.get-pod-name.outputs.pod_name }} -c binary-host -n sc -- find /tools/${{ inputs.env }} -name "partner-chains-node-*" -type f -mtime +30 -delete
+      shell: bash
+
+    - name: Copy binary to binary-host
+      continue-on-error: true
+      run: |
+        chmod +x partner-chains-node-binary
+        cp partner-chains-node-binary partner-chains-node-latest
+        cp partner-chains-node-binary partner-chains-node-${{ inputs.sha }} 
+        kubectl cp partner-chains-node-latest sc/${{ steps.get-pod-name.outputs.pod_name }}:/tools/${{ inputs.env }} -c binary-host
+        kubectl cp partner-chains-node-${{ inputs.sha }} sc/${{ steps.get-pod-name.outputs.pod_name }}:/tools/${{ inputs.env }} -c binary-host
+      shell: bash
+    
