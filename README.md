@@ -1,34 +1,111 @@
-# Cardano EVM Partner Chain: India Chain Demo
+# India Chain: Cardano EVM Partner Chain
 
-> **Note**: This repository contains a customized Substrate-based Partner Chain node with full EVM compatibility.
+## System Overview
+This repository contains a reference implementation of a Cardano Partner Chain node extended with full EVM compatibility. It serves as a foundational layer for building sovereignty-preserving sidechains that bridge the Cardano settlement layer with the Ethereum developer ecosystem.
 
-## 📚 Documentation Index
+### Architectural Diagram
 
-Start here to understand what has been built and how to use it.
+```mermaid
+graph TD
+    subgraph "Cardano Mainnet"
+        L1[Settlement & Security Layer]
+    end
 
-1.  **[CAPABILITIES.md](./CAPABILITIES.md)**: 🚀 What can you do with this chain? (DeFi, Supply Chain, smart contracts).
-2.  **[BUILD_SUMMARY.md](./BUILD_SUMMARY.md)**: 🛠 Technical details of the `lib.rs` and `Cargo.toml` modifications.
-3.  **[RUNBOOK.md](./RUNBOOK.md)**: 📘 How to start, stop, and maintain the node.
-4.  **[CREDENTIALS.md](./CREDENTIALS.md)**: 🔑 Pre-funded private keys for testing (10 Billion tokens).
-5.  **[EVM.md](./EVM.md)**: 🔮 Detailed EVM guide (RPC, Metadata, Deployment).
-6.  **[USER_GUIDE.md](./USER_GUIDE.md)**: 🧑‍🏫 Step-by-step specific guide for **MetaMask** and **Remix**.
+    subgraph "Partner Chain Node"
+        Consensus[Substrate Consensus<br/>(Aura / Grandpa)]
+        RPC[JSON-RPC Interface<br/>(HTTP / WS)]
+        
+        subgraph "Runtime"
+            Executive[Runtime Executive]
+            EVM[EVM Pallet<br/>(Frontier)]
+            System[System Pallet]
+        end
+        
+        RPC --> Executive
+        Executive --> EVM
+        Executive --> System
+        EVM --> StateDB[(EVM State DB)]
+        System --> BlockDB[(Block Storage)]
+    end
 
-## ⚡ Quick Start
-
-### 1. Build
-```bash
-cargo build --release -p partner-chains-demo-node
+    User[User / DApp] -->|Eth Transactions| RPC
+    Dev[Developer] -->|Deploy Contract| RPC
+    
+    Consensus -.->|Anchor State| L1
 ```
 
-### 2. Run
+---
+
+## Process Flow: Transaction Lifecycle
+
+The following diagram illustrates how an Ethereum-formatted transaction is processed by the Partner Chain node using the `fp_self_contained` architecture.
+
+```mermaid
+sequenceDiagram
+    participant User as Wallet (MetaMask)
+    participant RPC as Node RPC
+    participant Pool as Transaction Pool
+    participant Runtime as Runtime (Lib.rs)
+    participant EVM as EVM Pallet
+
+    User->>RPC: eth_sendRawTransaction(Tx)
+    RPC->>Pool: Validate & Submit
+    Pool->>Runtime: Checks (is_self_contained)
+    Runtime-->>Pool: Validated
+
+    Note over Pool,Runtime: Block Authoring Phase
+
+    Runtime->>EVM: apply_self_contained(Tx)
+    EVM->>EVM: Execute Solidity Code
+    EVM-->>Runtime: State Changes + Events
+    Runtime-->>User: Transaction Receipt
+```
+
+---
+
+## Operational Runbook
+
+### 1. System Requirements
+*   **OS**: Linux (Ubuntu 22.04+ recommended)
+*   **Rust**: Stable toolchain
+*   **Ports**: `9944` (RPC/WS), `30333` (P2P)
+
+### 2. Startup Procedures
+
+**Development Mode (Ephemeral State)**
+Ideal for testing and iteration. State is cleared on shutdown.
 ```bash
 ./target/release/partner-chains-demo-node --dev
 ```
 
-### 3. Connect (MetaMask)
-*   **RPC**: `http://127.0.0.1:9944`
-*   **Chain ID**: `1337`
+**Production Mode (Persistent State)**
+Retains chain data across restarts.
+```bash
+./target/release/partner-chains-demo-node --dev --base-path /data/chains/india-chain
+```
 
-## 📊 Dashboard
-We have included a local dashboard to visualize the Land Registry demo.
-Open `dev/india-dashboard.html` in your browser.
+### 3. Network Configuration
+| Parameter | Value | Description |
+| :--- | :--- | :--- |
+| **RPC Endpoint** | `http://127.0.0.1:9944` | Standard JSON-RPC interface |
+| **Chain ID** | `1337` | EIP-155 Replay Protection ID |
+| **Token Symbol** | `TEST` | Native currency symbol |
+
+---
+
+## Documentation Registry
+
+| Document | Description |
+| :--- | :--- |
+| **[Architecture & Capabilities](./CAPABILITIES.md)** | Detailed overview of the hybrid Substrate/EVM architecture and use cases. |
+| **[Build Summary](./BUILD_SUMMARY.md)** | Technical audit of runtime modifications and dependency injections. |
+| **[EVM Technical Guide](./EVM.md)** | comprehensive reference for RPC methods, deployment flows, and metadata handling. |
+| **[Operational Runbook](./RUNBOOK.md)** | Extended procedures for maintenance, debugging, and health checks. |
+| **[Credentials](./CREDENTIALS.md)** | Access keys for pre-funded development accounts. |
+
+---
+
+## Deployment Status
+*   **EVM Compatibility**: Full (Frontier Layer)
+*   **Consensus**: AuRa (Proof of Authority)
+*   **Latest Build**: v1.0.0-rc1
