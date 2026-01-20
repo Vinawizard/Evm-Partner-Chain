@@ -3,21 +3,24 @@
 ## System Overview
 This repository contains a reference implementation of a Cardano Partner Chain node extended with full EVM compatibility. It serves as a foundational layer for building sovereignty-preserving sidechains that bridge the Cardano settlement layer with the Ethereum developer ecosystem.
 
+## Introduction
+Welcome to the **India Chain**, a cutting-edge **Cardano Partner Chain** implementation that brings the power of the Ethereum Virtual Machine (EVM) to the Cardano ecosystem. This project demonstrates how to build a sovereign, high-performance sidechain that leverages **Substrate** for consensus and **Frontier** for full EVM compatibility, offering a "best of both worlds" solution for decentralized applications.
+
 ### Architectural Diagram
 
 ```mermaid
 graph TD
     subgraph "Cardano Mainnet"
-        L1["Settlement & Security Layer"]
+        L1["Settlement Layer"]
     end
 
     subgraph "Partner Chain Node"
-        Consensus["Substrate Consensus<br/>(Aura / Grandpa)"]
-        RPC["JSON-RPC Interface<br/>(HTTP / WS)"]
+        Consensus["Substrate Consensus (Aura / Grandpa)"]
+        RPC["JSON-RPC Interface (HTTP / WS)"]
         
         subgraph "Runtime"
             Executive["Runtime Executive"]
-            EVM["EVM Pallet<br/>(Frontier)"]
+            EVM["EVM Pallet (Frontier)"]
             System["System Pallet"]
         end
         
