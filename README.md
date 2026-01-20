@@ -8,31 +8,36 @@ This repository contains a reference implementation of a Cardano Partner Chain n
 ```mermaid
 graph TD
     subgraph "Cardano Mainnet"
-        L1[Settlement & Security Layer]
+        L1["Settlement & Security Layer"]
     end
 
     subgraph "Partner Chain Node"
-        Consensus[Substrate Consensus<br/>(Aura / Grandpa)]
-        RPC[JSON-RPC Interface<br/>(HTTP / WS)]
+        Consensus["Substrate Consensus<br/>(Aura / Grandpa)"]
+        RPC["JSON-RPC Interface<br/>(HTTP / WS)"]
         
         subgraph "Runtime"
-            Executive[Runtime Executive]
-            EVM[EVM Pallet<br/>(Frontier)]
-            System[System Pallet]
+            Executive["Runtime Executive"]
+            EVM["EVM Pallet<br/>(Frontier)"]
+            System["System Pallet"]
         end
         
         RPC --> Executive
         Executive --> EVM
         Executive --> System
-        EVM --> StateDB[(EVM State DB)]
-        System --> BlockDB[(Block Storage)]
+        EVM --> StateDB[("EVM State DB")]
+        System --> BlockDB[("Block Storage")]
     end
 
-    User[User / DApp] -->|Eth Transactions| RPC
-    Dev[Developer] -->|Deploy Contract| RPC
+    User["User / DApp"] -->|Eth Transactions| RPC
+    Dev["Developer"] -->|Deploy Contract| RPC
     
     Consensus -.->|Anchor State| L1
 ```
+
+**Architecture Context:**
+*   **Dual-Layer Design**: The node runs a Substrate consensus layer for speed, while the "Frontend" speaks Ethereum (JSON-RPC). This allows seamless use of MetaMask.
+*   **State Separation**: The EVM state (Smart Contracts) is stored separately from the System state (Governance/Staking) but managed by the same Executive.
+*   **Settlement**: The dotted line represents the capability to anchor Proofs to Cardano, inheriting its security.
 
 ---
 
@@ -60,6 +65,12 @@ sequenceDiagram
     EVM-->>Runtime: State Changes + Events
     Runtime-->>User: Transaction Receipt
 ```
+
+**Transaction Context:**
+1.  **Submission**: Users sign transactions with their existing Ethereum private keys; no conversion to Cardano format is needed by the user.
+2.  **Wrapperless Execution**: The Runtime detects `is_self_contained` and routes the transaction directly to `pallet-evm`, skipping standard Substrate signature checks.
+3.  **Receipts**: Standard Ethereum receipts (logs, gas used) are generated and returned, ensuring compatibility with indexers like The Graph.
+
 
 ---
 
