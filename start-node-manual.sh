@@ -40,4 +40,4 @@ export INITIAL_GOVERNANCE_THRESHOLD="1"
 export CARDANO_NODE_SOCKET_PATH=$(pwd)/dev/docker/sidechain-dependencies/ipc/node.socket
 
 echo "Starting Partner Chains Demo Node (Manual Mode)..."
-./target/release/partner-chains-demo-node --dev --execution Native
+RUST_LOG=runtime=debug,pallet_ethereum=trace,pallet_evm=trace ./target/release/partner-chains-demo-node --dev --execution Native

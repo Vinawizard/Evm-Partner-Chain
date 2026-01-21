@@ -1317,34 +1317,73 @@ impl_runtime_apis! {
 		}
 
 		fn call(
-			_from: H160,
-			_to: H160,
-			_data: Vec<u8>,
-			_value: U256,
-			_gas_limit: U256,
-			_max_fee_per_gas: Option<U256>,
-			_max_priority_fee_per_gas: Option<U256>,
-			_nonce: Option<U256>,
-			_estimate: bool,
-			_access_list: Option<Vec<(H160, Vec<H256>)>>,
-			_authorization_list: Option<ethereum::AuthorizationList>,
+			from: H160,
+			to: H160,
+			data: Vec<u8>,
+			value: U256,
+			gas_limit: U256,
+			max_fee_per_gas: Option<U256>,
+			max_priority_fee_per_gas: Option<U256>,
+			nonce: Option<U256>,
+			estimate: bool,
+			access_list: Option<Vec<(H160, Vec<H256>)>>,
+			authorization_list: Option<ethereum::AuthorizationList>,
 		) -> Result<fp_evm::ExecutionInfoV2<Vec<u8>>, sp_runtime::DispatchError> {
-			Err(sp_runtime::DispatchError::Other("Not implemented"))
+			use pallet_evm::Runner;
+
+			let config = pallet_evm::EvmConfig::london();
+
+			<Runtime as pallet_evm::Config>::Runner::call(
+				from,
+				to,
+				data,
+				value,
+				gas_limit.low_u64(),
+				max_fee_per_gas,
+				max_priority_fee_per_gas,
+				nonce,
+				access_list.unwrap_or_default(),
+				authorization_list.unwrap_or_default(),
+				false, // is_transactional
+				false, // validate
+				None, // weight_limit
+				None, // proof_size_limit
+				&config, // config (Passed as direct reference)
+			).map_err(|_| sp_runtime::DispatchError::Other("EVM execution failed"))
 		}
 
 		fn create(
-			_from: H160,
-			_data: Vec<u8>,
-			_value: U256,
-			_gas_limit: U256,
-			_max_fee_per_gas: Option<U256>,
-			_max_priority_fee_per_gas: Option<U256>,
-			_nonce: Option<U256>,
-			_estimate: bool,
-			_access_list: Option<Vec<(H160, Vec<H256>)>>,
-			_authorization_list: Option<ethereum::AuthorizationList>,
+			from: H160,
+			data: Vec<u8>,
+			value: U256,
+			gas_limit: U256,
+			max_fee_per_gas: Option<U256>,
+			max_priority_fee_per_gas: Option<U256>,
+			nonce: Option<U256>,
+			estimate: bool,
+			access_list: Option<Vec<(H160, Vec<H256>)>>,
+			authorization_list: Option<ethereum::AuthorizationList>,
 		) -> Result<fp_evm::ExecutionInfoV2<H160>, sp_runtime::DispatchError> {
-			Err(sp_runtime::DispatchError::Other("Not implemented"))
+			use pallet_evm::Runner;
+
+			let config = pallet_evm::EvmConfig::london();
+
+			<Runtime as pallet_evm::Config>::Runner::create(
+				from,
+				data,
+				value,
+				gas_limit.low_u64(),
+				max_fee_per_gas,
+				max_priority_fee_per_gas,
+				nonce,
+				access_list.unwrap_or_default(),
+				authorization_list.unwrap_or_default(),
+				false, // is_transactional
+				false, // validate
+				None, // weight_limit
+				None, // proof_size_limit
+				&config, // config (Passed as direct reference)
+			).map_err(|_| sp_runtime::DispatchError::Other("EVM execution failed"))
 		}
 
 		fn current_block() -> Option<ethereum::BlockV3> {

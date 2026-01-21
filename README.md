@@ -123,3 +123,25 @@ Retains chain data across restarts.
 *   **EVM Compatibility**: Full (Frontier Layer)
 *   **Consensus**: AuRa (Proof of Authority)
 *   **Latest Build**: v1.0.0-rc1
+
+---
+
+## 🛠️ Troubleshooting & Known Fixes
+
+### 1. `execution fatal: Other("")` on `eth_call`
+**Issue**: Read operations (like `contract.methods.myView().call()`) fail with a fatal execution error.
+**Cause**: The default Partner Chains template may have the Runtime API `call` function unimplemented.
+**Fix Applied**: 
+We implemented `fp_rpc::EthereumRuntimeRPCApi` in `demo/runtime/src/lib.rs` to delegate calls to the EVM Runner.
+```rust
+// In demo/runtime/src/lib.rs
+<Runtime as pallet_evm::Config>::Runner::call(
+    ...,
+    false, // is_transactional
+    false, // validate
+    None,  // weight_limit
+    None,  // proof_size_limit
+    &config, // MUST pass reference: &EvmConfig::london()
+)
+```
+*Note: This enables Remix, Metamask, and standard RPC read functionality.*

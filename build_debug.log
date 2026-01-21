@@ -1,0 +1,116 @@
+   Compiling partner-chains-demo-runtime v1.8.1 (/home/vinawizard/evm-partner-chain/partner-chains/demo/runtime)
+warning: hiding a lifetime that's elided elsewhere is confusing
+  --> /home/vinawizard/evm-partner-chain/frontier/client/rpc/src/eth/pending.rs:64:42
+   |
+64 | ..._runtime_api(&self) -> Result<(B::Hash, ApiRef<C::Api>), Error> {
+   |                 ^^^^^                      -------------- the same lifetime is hidden here
+   |                 |
+   |                 the lifetime is elided here
+   |
+   = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+   = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+   |
+64 |     pub(crate) async fn pending_runtime_api(&self) -> Result<(B::Hash, ApiRef<'_, C::Api>), Error> {
+   |                                                                               +++
+
+warning: `fc-rpc` (lib) generated 1 warning
+error: failed to run custom build command for `partner-chains-demo-runtime v1.8.1 (/home/vinawizard/evm-partner-chain/partner-chains/demo/runtime)`
+
+Caused by:
+  process didn't exit successfully: `/home/vinawizard/evm-partner-chain/partner-chains/target/debug/build/partner-chains-demo-runtime-1f30f9d1c725e19a/build-script-build` (exit status: 1)
+  --- stdout
+  Information that should be included in a bug report.
+  Executing build command: env -u CARGO_ENCODED_RUSTFLAGS -u RUSTC CARGO_MAKEFLAGS="-j --jobserver-fds=8,9 --jobserver-auth=8,9" CARGO_TARGET_DIR="/home/vinawizard/evm-partner-chain/partner-chains/target/debug/wbuild/partner-chains-demo-runtime/target" RUSTFLAGS="-C link-arg=--export-table -C link-arg=--export=__heap_base -C link-arg=--import-memory --cfg substrate_runtime " SKIP_WASM_BUILD="" "/home/vinawizard/.rustup/toolchains/1.90.0-x86_64-unknown-linux-gnu/bin/cargo" "rustc" "--target=wasm32v1-none" "--manifest-path=/home/vinawizard/evm-partner-chain/partner-chains/target/debug/wbuild/partner-chains-demo-runtime/Cargo.toml" "--color=always" "--profile" "release"
+  Using rustc version: rustc 1.90.0 (1159e78c4 2025-09-14)
+
+
+  --- stderr
+  warning: unused import: `McEpochNumber`
+    --> /home/vinawizard/evm-partner-chain/partner-chains/toolkit/block-participation/primitives/src/lib.rs:68:56
+     |
+  68 | use sidechain_domain::{DelegatorKey, MainchainKeyHash, McEpochNumber};
+     |                                                        ^^^^^^^^^^^^^
+     |
+     = note: `#[warn(unused_imports)]` on by default
+
+  warning: unused import: `McBlockHash`
+     --> /home/vinawizard/evm-partner-chain/partner-chains/toolkit/bridge/primitives/src/lib.rs:131:40
+      |
+  131 |     AssetId, AssetName, MainchainAddress, McBlockHash, McBlockNumber, PolicyId, UtxoId,
+      |                                           ^^^^^^^^^^^
+      |
+      = note: `#[warn(unused_imports)]` on by default
+
+  warning: `sp-block-participation` (lib) generated 1 warning (run `cargo fix --lib -p sp-block-participation` to apply 1 suggestion)
+  warning: `sp-partner-chains-bridge` (lib) generated 1 warning (run `cargo fix --lib -p sp-partner-chains-bridge` to apply 1 suggestion)
+     Compiling partner-chains-demo-runtime v1.8.1 (/home/vinawizard/evm-partner-chain/partner-chains/demo/runtime)
+  warning: unused import: `fp_rpc::TransactionStatus`
+    --> /home/vinawizard/evm-partner-chain/partner-chains/demo/runtime/src/lib.rs:67:5
+     |
+  67 | use fp_rpc::TransactionStatus;
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(unused_imports)]` on by default
+
+  error[E0599]: no function or associated item named `default` found for struct `EvmConfig` in the current scope
+      --> /home/vinawizard/evm-partner-chain/partner-chains/demo/runtime/src/lib.rs:1334:40
+       |
+  1334 |             let config = pallet_evm::EvmConfig::default();
+       |                                                 ^^^^^^^ function or associated item not found in `EvmConfig`
+       |
+  note: if you're trying to build a new `EvmConfig` consider using one of the following associated functions:
+        EvmConfig::frontier
+        EvmConfig::istanbul
+        EvmConfig::berlin
+        EvmConfig::london
+        and 4 others
+      --> /home/vinawizard/.cargo/git/checkouts/evm-68527307cd9f9c23/6917b13/runtime/src/lib.rs:313:2
+       |
+   313 |     pub const fn frontier() -> Config {
+       |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  ...
+   376 |     pub const fn istanbul() -> Config {
+       |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  ...
+   439 |     pub const fn berlin() -> Config {
+       |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  ...
+   444 |     pub const fn london() -> Config {
+       |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  error[E0599]: no function or associated item named `default` found for struct `EvmConfig` in the current scope
+      --> /home/vinawizard/evm-partner-chain/partner-chains/demo/runtime/src/lib.rs:1369:40
+       |
+  1369 |             let config = pallet_evm::EvmConfig::default();
+       |                                                 ^^^^^^^ function or associated item not found in `EvmConfig`
+       |
+  note: if you're trying to build a new `EvmConfig` consider using one of the following associated functions:
+        EvmConfig::frontier
+        EvmConfig::istanbul
+        EvmConfig::berlin
+        EvmConfig::london
+        and 4 others
+      --> /home/vinawizard/.cargo/git/checkouts/evm-68527307cd9f9c23/6917b13/runtime/src/lib.rs:313:2
+       |
+   313 |     pub const fn frontier() -> Config {
+       |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  ...
+   376 |     pub const fn istanbul() -> Config {
+       |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  ...
+   439 |     pub const fn berlin() -> Config {
+       |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  ...
+   444 |     pub const fn london() -> Config {
+       |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  warning: unused import: `fp_self_contained::SelfContainedCall`
+    --> /home/vinawizard/evm-partner-chain/partner-chains/demo/runtime/src/lib.rs:68:5
+     |
+  68 | use fp_self_contained::SelfContainedCall;
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  For more information about this error, try `rustc --explain E0599`.
+  warning: `partner-chains-demo-runtime` (lib) generated 2 warnings
+  error: could not compile `partner-chains-demo-runtime` (lib) due to 2 previous errors; 2 warnings emitted
